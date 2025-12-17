@@ -1,0 +1,93 @@
+﻿@model IEnumerable<LMS.Models.Subject>
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    ViewData["Title"] = "All Courses";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // 1. نجيب صلاحية المستخدم الحالي
+    var userRole = HttpContextAccessor.HttpContext.Session.GetString("UserRole");
+}
+
+<section class="page-hero">
+    <div class="container">
+        <h1>Explore Courses 🚀</h1>
+        <div class="breadcrumb">Home • All Courses</div>
+    </div>
+</section>
+
+<main class="page-main">
+
+    <aside class="sidebar">
+        <div class="sidebar-card search-box">
+            <h4>Search 🔍</h4>
+            <form asp-action="Courses" method="get">
+                <input type="text" name="searchString" placeholder="Search course name..." style="width: 100%; padding: 12px; border: 1px solid #e1e1e1; border-radius: 8px; outline: none;">
+            </form>
+        </div>
+
+        <div class="sidebar-card">
+            <h4 style="margin-bottom: 15px;">Categories 📂</h4>
+
+            <ul class="list-unstyled" style="padding-left: 0; list-style: none;">
+                <li style="margin-bottom: 10px;">
+                    <a asp-action="Courses" asp-route-categoryId="" style="text-decoration: none; color: #333; font-weight: bold; display: block; padding: 5px;">
+                        All Courses
+                    </a>
+                </li>
+
+                @if (ViewBag.ExistingCategories != null)
+                {
+                    @foreach (var cat in ViewBag.ExistingCategories)
+                    {
+                        <li style="margin-bottom: 8px;">
+                            <a asp-action="Courses" asp-route-categoryId="@cat.Id" style="text-decoration: none; color: #555; display: block; padding: 5px; transition: 0.3s;">
+                                @cat.Name
+                            </a>
+                        </li>
+                    }
+                }
+            </ul>
+        </div>
+    </aside>
+
+    <section class="courses-content">
+        <div class="courses-grid-student">
+            @foreach (var item in Model)
+            {
+                <div class="course-card">
+                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                    {
+                        <img src="~/images/@item.ImageUrl" alt="@item.Name" style="height: 180px; width: 100%; object-fit: cover; border-radius: 10px;">
+                    }
+                    else
+                    {
+                        <img src="~/images/default-course.jpg" style="height: 180px; width: 100%; object-fit: cover; border-radius: 10px;">
+                    }
+
+                    <div style="padding: 15px;">
+                        <span class="course-type @(item.ColorClass ?? "bg-purple")">
+                            @(@item.Category?.Name ?? "General")
+                        </span>
+
+                        <h4 style="font-size: 1.1rem; font-weight: 700; margin: 10px 0;">@item.Name</h4>
+
+                        <div class="course-meta">
+                            <span><i class="fas fa-user-tie"></i> @(item.Teacher?.FullName ?? "Unknown")</span>
+                        </div>
+
+                        <div class="course-price">
+                            <strong>$@item.Price</strong>
+
+                            @if (userRole != "Admin" && userRole != "Teacher")
+                            {
+                                <a asp-controller="Enrollment" asp-action="Checkout" asp-route-courseId="@item.Id" class="btn btn-primary" style="float: right; padding: 5px 15px; font-size: 0.8rem;">Enroll</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+</main>

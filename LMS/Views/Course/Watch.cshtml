@@ -1,0 +1,262 @@
+﻿@model LMS.ViewModels.CoursePlayerViewModel
+
+@{
+    // تصحيح الخطأ: استخدام Name بدلاً من Title كما يظهر في رسالة الخطأ
+    ViewData["Title"] = Model.Course.Name;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    /* 1. تنسيقات الصفحة العامة */
+    body {
+        background-color: #f3f4f6; /* لون خلفية هادئ */
+    }
+
+    .player-page {
+        padding-top: 110px; /* مسافة من الأعلى عشان الهيدر مايغطي المحتوى */
+        padding-bottom: 60px;
+        min-height: 100vh;
+    }
+
+    /* 2. منطقة الفيديو (اليسار) */
+    .video-section-card {
+        background: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+    }
+
+    .video-header {
+        padding: 20px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .lesson-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0;
+    }
+
+    /* الحاوية الخاصة بالفيديو لتظبيط الأبعاد 16:9 */
+    .video-wrapper {
+        position: relative;
+        padding-bottom: 56.25%; /* 16:9 Ratio */
+        height: 0;
+        background: #000;
+    }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+    /* منطقة أزرار التحكم والتقدم */
+    .action-bar {
+        padding: 20px;
+        background: #fafafa;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    /* 3. القائمة الجانبية (اليمين) */
+    .playlist-card {
+        background: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e5e7eb;
+        overflow: hidden;
+        height: 100%; /* عشان تاخد الطول المناسب */
+        max-height: 600px; /* أقصى ارتفاع */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .playlist-header {
+        background: #1e1b4b; /* لون غامق زي اللوجو */
+        color: white;
+        padding: 15px 20px;
+        font-weight: bold;
+    }
+
+    .playlist-body {
+        overflow-y: auto; /* سكرول داخلي للقائمة */
+        flex-grow: 1;
+    }
+
+    /* تنسيق الأكورديون (السكاشن) */
+    .accordion-button {
+        background-color: #f9fafb;
+        color: #374151;
+        font-weight: 600;
+        box-shadow: none !important;
+    }
+
+        .accordion-button:not(.collapsed) {
+            background-color: #eef2ff; /* لون فاتح لما السكشن يفتح */
+            color: #4f46e5;
+        }
+
+    /* تنسيق الدروس */
+    .lesson-link {
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+        color: #4b5563;
+        text-decoration: none;
+        transition: 0.2s;
+        border-left: 4px solid transparent;
+        font-size: 0.9rem;
+    }
+
+        .lesson-link:hover {
+            background-color: #f3f4f6;
+        }
+
+        /* الدرس النشط حالياً */
+        .lesson-link.active-lesson {
+            background-color: #e0e7ff;
+            color: #4338ca;
+            border-left-color: #4338ca;
+            font-weight: 700;
+        }
+
+    .icon-box {
+        width: 25px;
+        text-align: center;
+        margin-right: 10px;
+    }
+
+    /* زر الاكتمال */
+    .btn-complete {
+        background-color: #10b981;
+        color: white;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+        .btn-complete:hover {
+            background-color: #059669;
+        }
+</style>
+
+<div class="container player-page">
+    <div class="row">
+
+        <div class="col-lg-8 mb-4">
+            <div class="video-section-card">
+
+                <div class="video-header">
+                    <h1 class="lesson-title">
+                        <i class="fa-solid fa-play-circle text-primary me-2"></i> @Model.CurrentLesson.Title
+                    </h1>
+                </div>
+
+                <div class="video-wrapper">
+                    @if (Model.CurrentLesson.Type == LMS.Models.LessonType.Video)
+                    {
+                        <iframe src="@Model.CurrentLesson.ContentUrl" allowfullscreen></iframe>
+                    }
+                    else
+                    {
+                        <div class="d-flex flex-column justify-content-center align-items-center h-100" style="background:#f8f9fa;">
+                            <i class="fa-solid fa-file-pdf fa-4x text-danger mb-3"></i>
+                            <h4>Document Lesson</h4>
+                            <a href="@Model.CurrentLesson.ContentUrl" class="btn btn-outline-primary mt-2" download>
+                                <i class="fa-solid fa-download"></i> Download File
+                            </a>
+                        </div>
+                    }
+                </div>
+
+                <div class="action-bar">
+                    <div class="progress-container">
+                        <small class="text-muted fw-bold">COURSE PROGRESS: @Model.ProgressPercentage%</small>
+                        <div class="progress" style="height: 8px; width: 200px; margin-top: 5px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: @Model.ProgressPercentage%"></div>
+                        </div>
+                    </div>
+
+                    <form asp-action="CompleteLesson" method="post">
+                        <input type="hidden" name="lessonId" value="@Model.CurrentLesson.Id" />
+                        <input type="hidden" name="courseId" value="@Model.Course.Id" />
+
+                        @if (Model.ProgressPercentage < 100)
+                        {
+                            <button type="submit" class="btn-complete">
+                                <i class="fa-solid fa-check"></i> Mark as Completed
+                            </button>
+                        }
+                        else
+                        {
+                            <button disabled class="btn btn-secondary">
+                                <i class="fa-solid fa-trophy"></i> Completed
+                            </button>
+                        }
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="playlist-card">
+                <div class="playlist-header">
+                    <i class="fa-solid fa-list me-2"></i> Course Content
+                </div>
+
+                <div class="playlist-body">
+                    <div class="accordion accordion-flush" id="courseContentAccordion">
+
+                        @foreach (var module in Model.Course.Modules)
+                        {
+                            var isModuleActive = module.Lessons.Any(l => l.Id == Model.CurrentLesson.Id);
+                            var showClass = isModuleActive ? "show" : "";
+                            var buttonCollapsed = isModuleActive ? "" : "collapsed";
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading-@module.Id">
+                                    <button class="accordion-button @buttonCollapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@module.Id">
+                                        @module.Title
+                                    </button>
+                                </h2>
+
+                                <div id="collapse-@module.Id" class="accordion-collapse collapse @showClass" data-bs-parent="#courseContentAccordion">
+                                    <div class="accordion-body p-0">
+
+                                        @foreach (var lesson in module.Lessons)
+                                        {
+                                            var activeClass = (lesson.Id == Model.CurrentLesson.Id) ? "active-lesson" : "";
+                                            var icon = (lesson.Type == LMS.Models.LessonType.Video) ? "fa-circle-play" : "fa-file-lines";
+
+                                            <a href="@Url.Action("Watch", "Course", new { id = Model.Course.Id, lessonId = lesson.Id })" class="lesson-link @activeClass">
+                                                <div class="icon-box">
+                                                    <i class="fa-regular @icon"></i>
+                                                </div>
+                                                @lesson.Title
+                                            </a>
+                                        }
+
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

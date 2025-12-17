@@ -1,0 +1,78 @@
+﻿@model List<LMS.Models.User>
+
+@{
+    ViewData["Title"] = "User Management";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container admin-page-container">
+
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <h3><i class="fas fa-users-cog"></i> User Management</h3>
+            <p>Overview of all registered members and roles.</p>
+        </div>
+
+        <div class="table-responsive">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>#ID</th>
+                        <th>Full Name</th>
+                        <th>Email Address</th>
+                        <th style="text-align:center;">Role</th>
+                        <th style="text-align:center;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr>
+                            <td><strong>@user.Id</strong></td>
+                            <td style="font-weight: 600; color: #1A0C2F;">@user.FullName</td>
+                            <td style="color: #666;">@user.Email</td>
+
+                            <td style="text-align:center;">
+                                @if (user.Role == "Admin")
+                                {
+                                    <span class="role-badge role-admin">
+                                        <i class="fas fa-crown"></i> Admin
+                                    </span>
+                                }
+                                else if (user.Role == "Teacher")
+                                {
+                                    <span class="role-badge role-teacher">
+                                        <i class="fas fa-chalkboard-user"></i> Teacher
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="role-badge role-student">
+                                        <i class="fas fa-user-graduate"></i> Student
+                                    </span>
+                                }
+                            </td>
+
+                            <td style="text-align:center;">
+                                @if (user.Role != "Admin")
+                                {
+                                    <a asp-action="MakeAdmin" asp-route-id="@user.Id"
+                                       class="btn-action btn-promote"
+                                       onclick="return confirm('Promote to Admin?')">
+                                        Make Admin <i class="fas fa-arrow-up"></i>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span style="color:#aaa; font-size:0.9rem;">
+                                        <i class="fas fa-check-circle"></i> Super Admin
+                                    </span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

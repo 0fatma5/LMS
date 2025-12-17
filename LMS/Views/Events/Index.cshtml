@@ -1,0 +1,76 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@model IEnumerable<LMS.Models.Event>
+
+@{
+    ViewData["Title"] = "Events";
+}
+
+<section class="page-hero">
+    <div class="container hero-inner">
+        <h1>Upcoming Events</h1>
+        <div class="breadcrumb">Home &gt; Events</div>
+
+
+    </div>
+</section>
+
+<section class="events-section">
+    <div class="container">
+        <div class="events-list">
+
+            @if (!Model.Any())
+            {
+                <div class="text-center" style="padding: 50px;">
+                    <h3 style="color: #666;">No upcoming events at the moment.</h3>
+                </div>
+            }
+            else
+            {
+                int i = 0;
+                foreach (var item in Model)
+                {
+                    string cardClass = (i % 2 == 0) ? "event-card" : "event-card right";
+
+                    <article class="@cardClass">
+                        <div class="thumb">
+                            <img src="~/images/events/@item.ImageUrl" alt="@item.Title" onerror="this.src='/images/default.jpg'">
+                        </div>
+                        <div class="content">
+                            <div class="meta">
+                                <span class="dot"></span>
+                                <span>@item.EventDate.ToString("dd MMM yyyy") | @item.Duration</span>
+                                <span style="margin-left:8px; color:var(--primary-color); font-weight:600">
+                                    @item.SpeakerName
+                                </span>
+                            </div>
+                            <div class="title">@item.Title</div>
+                            <div class="excerpt">@item.Description</div>
+                            <a class="read-more" href="#">Read More <i class="fas fa-arrow-right" style="margin-left:8px;font-size:12px"></i></a>
+
+                        </div>
+                    </article>
+
+                    i++;
+                }
+            }
+
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        var successMsg = '@TempData["SuccessMessage"]';
+        if (successMsg) {
+            Swal.fire({
+                title: 'Great Job!',
+                text: successMsg,
+                icon: 'success',
+                confirmButtonColor: '#5D3CF2',
+                confirmButtonText: 'Done'
+            });
+        }
+    </script>
+}

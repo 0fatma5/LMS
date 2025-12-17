@@ -1,0 +1,206 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SkillBoost - Online Learning Center</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="~/css/style.css" />
+</head>
+<body>
+
+    <header>
+        <div class="container navbar">
+            <div class="logo">
+                <a href="/">
+                    <img src="~/images/logo.jpg" alt="SkillBoost Icon" class="logo-icon">
+                    <img src="~/images/skill.jpg" alt="SkillBoost Text" class="logo-text">
+                </a>
+            </div>
+
+            <nav>
+                <ul class="main-nav-links">
+                    <li><a href="/">Home</a></li>
+                    <li><a asp-controller="Home" asp-action="About">About</a></li>
+                    <li><a asp-controller="Home" asp-action="Contact">Contact</a></li>
+                    <li><a asp-controller="Home" asp-action="Courses">Courses 🎓</a></li>
+                    <li><a asp-controller="Events" asp-action="Index">Events</a></li>
+                    <li><a asp-controller="News" asp-action="Index">News 📰</a></li>
+
+                    @{
+                        // تعريف المتغيرات هنا عشان نستخدمها تحت بسهولة
+                        var userRole = Context.Session.GetString("UserRole");
+                        var userName = Context.Session.GetString("UserName");
+                    }
+
+             
+
+                    @if (userRole == "Teacher" || userRole == "Admin")
+                    {
+                        // --- قائمة المدرس والآدمن (Dropdown) ---
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="color: var(--primary-color); font-weight: bold;">
+                                Dashboard ⚙️
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a asp-controller="Subjects" asp-action="Index">
+                                        <i class="fas fa-book-open"></i> Manage Courses
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Events" asp-action="MyEvents">
+                                        <i class="fas fa-calendar-alt"></i> Manage Events
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="News" asp-action="MyNews">
+                                        <i class="far fa-newspaper"></i> Manage News
+                                    </a>
+                                </li>
+
+                                <li style="border-top: 1px solid #eee; margin: 5px 0;"></li>
+
+                                <li>
+                                    <a asp-controller="Subjects" asp-action="Create">
+                                        <i class="fas fa-plus-circle"></i> Create Course
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Events" asp-action="Create">
+                                        <i class="fas fa-calendar-plus"></i> Create Event
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="News" asp-action="Create">
+                                        <i class="fas fa-pen-nib"></i> Create News
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    else if (userRole == "Student") // تأكد إن الرتبة اسمها Student في الداتابيز
+                    {
+                        // --- رابط الطالب فقط ---
+                        <li>
+                            <a asp-controller="Enrollment" asp-action="StudentDashboard" style="color: var(--primary-color); font-weight: 600;">
+                                My Learning 🎓
+                            </a>
+                        </li>
+                    }
+
+                </ul>
+            </nav>
+
+            <div class="nav-actions">
+                @if (!string.IsNullOrEmpty(userName))
+                {
+                    <span style="font-weight:bold; color: var(--primary-color); margin-right:10px;">Hello, @userName</span>
+
+                    @if (userRole == "Admin")
+                    {
+                        <a href="/Admin/Users" class="btn btn-primary" style="padding: 5px 10px; font-size: 12px; margin-right:5px;">
+                            Users <i class="fas fa-users"></i>
+                        </a>
+                    }
+
+                    <a href="/Account/Logout" class="btn btn-white" style="font-size:14px; padding: 8px 15px;">Logout</a>
+                }
+                else
+                {
+                    <a href="/Account/Login" class="nav-link-login">Login</a>
+                    <a href="/Account/Register" class="btn btn-primary">Get Started</a>
+                }
+            </div>
+        </div>
+    </header>
+
+    @RenderBody()
+
+    <footer class="footer-section">
+        <div class="container cta-container">
+            <div class="cta-box">
+                <div class="cta-text">
+                    <h2>Still You Need Our <span class="highlight">Support</span> ?</h2>
+                    <p>Don't wait make a smart & logical quote here. Its pretty easy.</p>
+                </div>
+                <div class="cta-form">
+                    <input type="email" placeholder="Enter your email here">
+                    <button class="btn btn-primary">Subscribe Now</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="container footer-links">
+            <div class="footer-col">
+                <h4>About us</h4>
+                <p>Corporate clients and leisure travelers has been relying on Groundlink for dependable safe, and professional chauffeured car service.</p>
+                <div class="opening-hours">
+                    <div class="icon"><i class="far fa-clock"></i></div>
+                    <div>
+                        <strong>OPENING HOURS</strong>
+                        <p>Mon - Sat (8.00 - 6.00)<br>Sunday - Closed</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4>Useful Links</h4>
+                <ul>
+                    <li><a href="">About Us</a></li>
+                    <li><a href="#">Teachers</a></li>
+                    <li><a href="#">Partner</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Course</h4>
+                <ul>
+                    <li><a href="#">Ui Ux Design</a></li>
+                    <li><a href="#">Web Development</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Recent Post</h4>
+                <div class="recent-post-item">
+                    <img src="~/images/best.jpg" alt="Post">
+                    <div>
+                        <span>02 Apr 2025</span>
+                        <h5>Best Your Business</h5>
+                    </div>
+                </div>
+                <div class="recent-post-item">
+                    <img src="~/images/keep.jpg" alt="Post">
+                    <div>
+                        <span>02 Apr 2025</span>
+                        <h5>Keep Your Business</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom container">
+            <div class="footer-logo-group">
+                <img src="~/images/logo f.jpg" alt="SkillBoost Icon" class="footer-logo-icon">
+                <span class="footer-logo-text">SkillBoost</span>
+            </div>
+            <p>Copyright © 2025 All Rights Reserved.</p>
+            <div class="socials">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

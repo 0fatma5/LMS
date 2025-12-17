@@ -1,0 +1,199 @@
+﻿@model LMS.Models.Lesson
+
+@{
+    ViewData["Title"] = "Edit Lesson";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* 1. خلفية الصفحة وتوسيط المحتوى */
+    .course-form-page {
+        padding-top: 140px; /* مسافة عشان الهيدر ما يغطيش المحتوى */
+        padding-bottom: 80px;
+        background-color: #f4f6f9; /* لون رمادي فاتح للخلفية */
+        min-height: 100vh;
+    }
+
+    /* 2. الكارت الأبيض */
+    .course-form-card {
+        background: #ffffff;
+        border-radius: 20px; /* حواف دائرية */
+        padding: 50px;
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.05); /* ظل ناعم */
+        border: 1px solid #eef0f3;
+    }
+
+    /* 3. تنسيق الهيدر (العنوان) */
+    .form-header {
+        margin-bottom: 35px;
+        border-bottom: 2px solid #f7f7f7;
+        padding-bottom: 20px;
+    }
+
+        .form-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1A0C2F;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+            .form-header h2 i {
+                color: #6366f1; /* لون موف */
+                background: rgba(99, 102, 241, 0.1);
+                padding: 10px;
+                border-radius: 12px;
+                font-size: 1.4rem;
+            }
+
+    /* 4. حقول الإدخال */
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #4a5568;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+    .form-control {
+        border-radius: 10px;
+        padding: 14px 18px;
+        border: 1px solid #e2e8f0;
+        background-color: #fcfcfc;
+        font-size: 0.95rem;
+        color: #1e293b;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+        .form-control:focus {
+            background-color: #fff;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            outline: none;
+        }
+
+    /* 5. مربع اللينك الحالي */
+    .current-link-box {
+        margin-top: 15px;
+        padding: 15px;
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* 6. الأزرار */
+    .btn-action-wrapper {
+        display: flex;
+        gap: 15px;
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid #f7f7f7;
+    }
+
+    .btn-custom {
+        padding: 12px 35px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+
+    .btn-primary-c {
+        background-color: #6366f1;
+        color: white;
+    }
+
+        .btn-primary-c:hover {
+            background-color: #4f46e5;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+            color: white;
+        }
+
+    .btn-white-c {
+        background-color: white;
+        color: #64748b;
+        border: 1px solid #e2e8f0;
+    }
+
+        .btn-white-c:hover {
+            background-color: #f1f5f9;
+            color: #334155;
+        }
+</style>
+
+<div class="course-form-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <div class="course-form-card">
+
+                    <div class="form-header">
+                        <h2><i class="fas fa-pen-to-square"></i> Edit Lesson</h2>
+                        <p class="text-muted mb-0" style="margin-left: 50px;">Update content details for your students.</p>
+                    </div>
+
+                    <form asp-action="EditLesson" enctype="multipart/form-data">
+                        <input type="hidden" name="id" value="@Model.Id" />
+
+                        <div class="form-group">
+                            <label>Lesson Title</label>
+                            <input type="text" name="title" value="@Model.Title" class="form-control" required />
+                        </div>
+
+                        @if (Model.Type == LMS.Models.LessonType.Video)
+                        {
+                            <div class="form-group">
+                                <label>Video URL (YouTube/Embed)</label>
+                                <input type="url" name="url" value="@Model.ContentUrl" class="form-control" placeholder="https://youtube.com/..." />
+
+                                <div class="current-link-box">
+                                    <i class="fas fa-video text-primary"></i>
+                                    <small class="text-muted">Current Video Source:</small>
+                                    <a href="@Model.ContentUrl" target="_blank" class="text-primary fw-bold text-decoration-none">
+                                        Test Link <i class="fas fa-external-link-alt ms-1" style="font-size: 10px;"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="form-group">
+                                <label>Update Document (PDF/Word)</label>
+                                <input type="file" name="lessonFile" class="form-control" accept=".pdf,.doc,.docx,.ppt,.pptx" style="padding: 10px; background: #fff;" />
+
+                                <div class="mt-2 text-muted small" style="display:flex; align-items:center; gap:5px;">
+                                    <i class="fas fa-info-circle text-primary"></i>
+                                    Upload a new file only if you want to replace the existing one.
+                                </div>
+                            </div>
+                        }
+
+                        <div class="btn-action-wrapper">
+                            <button type="submit" class="btn-custom btn-primary-c">Save Changes</button>
+                            <a href="javascript:history.back()" class="btn-custom btn-white-c">Cancel</a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

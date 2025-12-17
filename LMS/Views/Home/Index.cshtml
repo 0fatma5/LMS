@@ -1,0 +1,170 @@
+﻿@model LMS.ViewModels.HomeViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<section class="hero-section">
+    <div class="container hero-content">
+        <div class="hero-text">
+            <span class="subtitle">EDUCATION SOLUTION</span>
+            <h1>Cloud-based LMS <br> Trusted by 1000+</h1>
+            <p>Lorem Ipsum is simply dummy text of the printing typesetting industry. Lorem Ipsum has been the industry's standard dummy text.</p>
+            <div class="hero-btns">
+                <a href="#" class="btn btn-white">View Courses</a>
+                <a href="#" class="link-arrow">Find out more <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="~/images/student.png" alt="Student">
+        </div>
+    </div>
+
+    <div class="container partners-container">
+        <div class="partners-bar">
+            <img src="~/images/heax.png" alt="Hexa">
+            <img src="~/images/circle.png" alt="Circle">
+            <img src="~/images/treav.png" alt="Treva">
+            <img src="~/images/alts.png" alt="Atlas">
+            <img src="~/images/josev.png" alt="Josef">
+        </div>
+    </div>
+</section>
+
+<section class="about-section">
+    <div class="container about-grid">
+        <div class="about-images">
+            <div class="img-big">
+                <img src="~/images/std2.jpeg" alt="Kid">
+            </div>
+            <div class="img-small">
+                <img src="~/images/std3.jpeg" alt="Adult">
+            </div>
+            <div class="exp-badge">
+                <span class="number">25+</span>
+                <span class="text">YEARS EXPERIENCE <br> JUST ACHIEVED</span>
+            </div>
+        </div>
+
+        <div class="about-content">
+            <span class="tag-pill">About Us</span>
+            <h2>Welcome to the <span class="underline-style">Online</span> <br> Learning Center</h2>
+            <p class="lead-text">Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC.</p>
+
+            <ul class="check-list">
+                <li><i class="fas fa-check"></i> Lorem Ipsum is simply dummy text</li>
+                <li><i class="fas fa-check"></i> Explore a variety of fresh educational teach</li>
+                <li><i class="fas fa-check"></i> Lorem Ipsum is simply dummy text of</li>
+            </ul>
+
+            <div class="stats-row">
+                <div class="stat-item">
+                    <i class="fas fa-certificate"></i>
+                    <div>
+                        <h3>0+</h3>
+                        <p>Total Achievement</p>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-user-graduate"></i>
+                    <div>
+                        <h3>0+</h3>
+                        <p>Total Students</p>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <div>
+                        <h3>0k</h3>
+                        <p>Total Instructor</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="subjects-section">
+    <div class="container subjects-grid">
+        <div class="subjects-text">
+            <span class="tag-pill">Popular Subject</span>
+            <h2>Provide It & Technol <br> Subject For You</h2>
+            <p>Construction is a general term meaning the art and science to form systems organizations, and comes from Latin.</p>
+            <div class="quote-box">
+                Construction is a general term meaning the art and science to form systems organizations.
+            </div>
+            <a href="#" class="btn btn-primary">Explore More <i class="fas fa-arrow-right"></i></a>
+        </div>
+
+        <div class="subjects-cards">
+            @foreach (var item in Model.Subjects)
+            {
+                <div class="subject-card">
+                    <div class="icon-box @item.ColorClass">
+                        <i class="fas @item.ImageUrl"></i>
+                    </div>
+                    <h3>@item.Name</h3>
+                    <p>@item.Description</p>
+                    <a href="#">View Subject <i class="fas fa-arrow-right"></i></a>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+@* <section class="blog-section">
+    <div class="container">
+        <div class="section-header text-center">
+            <span class="tag-pill">News & Blogs</span>
+            <h2>Latest News & Blog</h2>
+        </div>
+
+        <div class="blog-grid">
+            @{
+                var mainPost = Model.Blogs.FirstOrDefault(); // هات أول مقال
+                var sidePosts = Model.Blogs.Skip(1).ToList(); // هات الباقي
+            }
+
+            @if (mainPost != null)
+            {
+                <div class="blog-card main-post">
+                    <div class="blog-img">
+                        <img src="@Url.Content(mainPost.ImageUrl)" alt="Blog">
+                        <span class="date-badge">
+                            @mainPost.PublishedDate.ToString("dd") <br> @mainPost.PublishedDate.ToString("MMM")
+                        </span>
+                    </div>
+                    <div class="blog-content">
+                        <h3>@mainPost.Title</h3>
+                        <p>@mainPost.Description</p>
+                        <div class="blog-meta">
+                            <div class="author">
+                                <img src="@mainPost.AuthorImage" alt="User">
+                                <span>By: @mainPost.AuthorName</span>
+                            </div>
+                            <div class="share-icons">
+                                <i class="fab fa-facebook-f"></i>
+                                <i class="fab fa-youtube"></i>
+                                <i class="fab fa-instagram"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="side-posts">
+                @foreach (var item in sidePosts)
+                {
+                    <div class="blog-card side-card">
+                        <div class="blog-img">
+                            <img src="@Url.Content(item.ImageUrl)" alt="Blog">
+                            <span class="date-badge">@item.PublishedDate.ToString("dd MMM")</span>
+                        </div>
+                        <div class="blog-content">
+                            <h3>@item.Title</h3>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section> *@

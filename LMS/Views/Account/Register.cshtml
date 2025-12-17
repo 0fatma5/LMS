@@ -1,0 +1,55 @@
+﻿@model LMS.Models.User
+
+@{
+    ViewData["Title"] = "Sign Up";
+    // هذا السطر مهم ليضمن أن الصفحة تأخذ ملف التنسيق الرئيسي
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<main class="login-page">
+    <div class="login-card">
+
+        <div class="login-form-area">
+            <h2>Create Account</h2>
+
+            <form asp-action="Register" method="POST">
+
+                <div class="form-group">
+                    <input asp-for="FullName" placeholder="Full Name" required autocomplete="off">
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <input asp-for="Email" placeholder="Email Address" required autocomplete="off">
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <input asp-for="Password" type="password" placeholder="Password" required>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <input asp-for="PhoneNumber" placeholder="Phone Number (Optional)">
+                </div>
+                <div class="form-group">
+                    <label style="font-weight:600; color:#2e1a5e;">I want to join as:</label>
+                    <select asp-for="Role" class="form-control" style="padding: 10px; height:auto;">
+                        <option value="Student">Student </option>
+                        <option value="Teacher">Teacher </option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary login-button">Sign Up</button>
+            </form>
+
+            <div class="no-account">
+                Already have an account? <a asp-controller="Account" asp-action="Login">Log in</a>
+            </div>
+        </div>
+
+        <div class="login-image-area">
+            <img src="~/images/book.jpg" alt="Sign Up Image">
+        </div>
+    </div>
+</main>

@@ -1,0 +1,107 @@
+﻿@model LMS.Models.Subject
+
+@{
+    ViewData["Title"] = "Checkout";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // الحل هنا: ضفنا حرف m جنب 0.14 وغيرنا النوع لـ decimal
+    decimal vat = Model.Price * 0.14m;
+    decimal total = Model.Price + vat;
+}
+
+<div class="checkout-wrapper">
+    <div class="checkout-card">
+
+        <div class="form-section">
+            <h2>Secure Payment</h2>
+            <p style="color:#666; margin-bottom:30px;">
+                Complete your purchase for <strong style="color:var(--primary-color)">@Model.Name</strong>
+            </p>
+
+            <form asp-controller="Enrollment" asp-action="ConfirmPayment" method="post">
+                <input type="hidden" name="courseId" value="@Model.Id" />
+
+                <div>
+                    <label class="input-label">Cardholder Name</label>
+                    <input type="text" class="custom-input" placeholder="e.g. John Doe" required>
+                </div>
+
+                <div>
+                    <label class="input-label">Card Number</label>
+                    <input type="text" class="custom-input" placeholder="0000 0000 0000 0000" maxlength="19" required>
+                </div>
+
+                <div style="display:flex; gap:20px;">
+                    <div style="flex:1">
+                        <label class="input-label">Expiration Date</label>
+                        <input type="month" class="custom-input" required>
+                    </div>
+                    <div style="flex:1">
+                        <label class="input-label">CVV</label>
+                        <input type="text" class="custom-input" placeholder="123" maxlength="3" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="pay-btn">
+                    Pay $@total.ToString("0.00")
+                </button>
+            </form>
+        </div>
+
+        <div class="summary-section">
+            <h3 style="margin-bottom:25px; color:#1A0C2F;">Order Summary</h3>
+
+            <div class="summary-row">
+                <span>Course Price</span>
+                <strong>$@Model.Price</strong>
+            </div>
+
+            <div class="summary-row">
+                <span>VAT (14%)</span>
+                <strong>$@vat.ToString("0.00")</strong>
+            </div>
+
+            @if (Model.Teacher != null)
+            {
+                <div class="summary-row">
+                    <span>Instructor</span>
+                    <strong>@Model.Teacher.FullName</strong>
+                </div>
+            }
+
+            @if (Model.Category != null)
+            {
+                <div class="summary-row">
+                    <span>Category</span>
+                    <strong>@Model.Category.Name</strong>
+                </div>
+            }
+
+            <div class="total-row">
+                <div>
+                    <span style="display:block; font-size:13px; color:#777;">Total to pay</span>
+                    <span class="total-price">$@total.ToString("0.00")</span>
+                </div>
+                <i class="fas fa-receipt" style="font-size:30px; color:#ccc;"></i>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        var successMsg = '@TempData["SuccessMessage"]';
+        if (successMsg) {
+            Swal.fire({
+                title: 'Great Job!',
+                text: successMsg,
+                icon: 'success',
+                confirmButtonColor: '#5D3CF2',
+                confirmButtonText: 'Done'
+            });
+        }
+    </script>
+
+}

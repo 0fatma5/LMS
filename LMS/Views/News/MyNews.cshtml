@@ -1,0 +1,77 @@
+﻿@model IEnumerable<LMS.Models.News>
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    ViewData["Title"] = "My News";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var userName = HttpContextAccessor.HttpContext.Session.GetString("UserName");
+}
+
+<section class="profile-hero" style="background-image: url('/images/backteach.jpeg'); background-size: cover; height: 230px;"></section>
+
+<div class="profile-card container" style="margin-top: -80px; position: relative; z-index: 10;">
+    <div class="profile-info">
+        <h2 style="text-transform: capitalize;">@userName</h2>
+        <p style="color: var(--primary-color); font-weight: 600;">Content Creator 📰</p>
+
+        <div style="margin-top: 20px;">
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fas fa-plus-circle"></i> Publish Article
+            </a>
+        </div>
+    </div>
+    <img src="~/images/logo.jpg" class="profile-img" alt="Profile Image">
+</div>
+
+<div class="container courses-container" style="margin-top: 50px; margin-bottom: 100px;">
+    <h3 class="courses-title">My Articles <span style="font-size:0.8em; color:#888;">(@Model.Count())</span></h3>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center" style="padding: 50px; color: #777;">
+            <h3>No articles published yet! 📭</h3>
+        </div>
+    }
+    else
+    {
+        <div class="courses-grid">
+            @foreach (var item in Model)
+            {
+                <div class="course-card">
+                    <div class="course-type" style="position: absolute; top: 20px; left: 20px; z-index: 2; padding: 5px 15px; border-radius: 20px; background-color: #6f42c1; color: white; font-size: 0.8rem; font-weight: 600;">
+                        @item.Category
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                    {
+                        <img src="~/images/news/@item.ImageUrl" alt="@item.Title" style="height: 180px; width: 100%; object-fit: cover; border-radius: 10px;">
+                    }
+                    else
+                    {
+                        <img src="https://via.placeholder.com/400x250" alt="Default" style="height: 180px; width: 100%; object-fit: cover; border-radius: 10px;">
+                    }
+
+                    <h4 style="margin-top: 15px; font-weight: 700;">@item.Title</h4>
+
+                    <div class="course-meta">
+                        <span><i class="far fa-calendar-alt"></i> @item.PublishedDate.ToString("MMM dd, yyyy")</span>
+                    </div>
+
+                    <p style="font-size: 0.9rem; color: #666; margin: 10px 0;">
+                        @(item.Description.Length > 60 ? item.Description.Substring(0, 60) + "..." : item.Description)
+                    </p>
+
+                    <div class="course-actions" style="margin-top: 15px; display: flex; gap: 10px;">
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn" style="flex: 1; background-color: #2e1a5e; color: white; padding: 8px; border-radius: 5px; text-align: center;">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger" title="Delete">
+                            <i class="fas fa-trash"></i> Delete
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -1,0 +1,82 @@
+﻿@model LMS.Models.Contact
+
+@{
+    ViewData["Title"] = "Contact Us";
+}
+
+<section class="contact-header">
+    <div class="container">
+        <h1>Contact Us</h1>
+        <p>We are here to help you</p>
+    </div>
+</section>
+
+<section class="contact-info container">
+    <div class="info-card">
+        <i class="fas fa-envelope"></i>
+        <h3>Mail Address</h3>
+        <p>Skillboost@gmail.com</p>
+    </div>
+    <div class="info-card">
+        <i class="fas fa-map-marker-alt"></i>
+        <h3>Office Address</h3>
+        <p>23/A, New Helhi Tower</p>
+    </div>
+    <div class="info-card">
+        <i class="fas fa-phone"></i>
+        <h3>Phone Number</h3>
+        <p>+966 885 963 258</p>
+    </div>
+</section>
+
+<section class="contact-form-section">
+    <h3>Drop Us a Line</h3>
+
+    <form asp-action="Contact" method="post">
+        <div class="form-row">
+            <div style="flex:1;">
+                <input asp-for="Name" placeholder="Your Name" />
+                <span asp-validation-for="Name" class="text-danger" style="font-size:12px;"></span>
+            </div>
+
+            <div style="flex:1;">
+                <input asp-for="Email" placeholder="Email Address" />
+                <span asp-validation-for="Email" class="text-danger" style="font-size:12px;"></span>
+            </div>
+
+            <div style="flex:1;">
+                <input asp-for="Phone" placeholder="Phone" />
+                <span asp-validation-for="Phone" class="text-danger" style="font-size:12px;"></span>
+            </div>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <input asp-for="Subject" placeholder="Subject" />
+        </div>
+
+        <div>
+            <textarea asp-for="Message" placeholder="Message"></textarea>
+            <span asp-validation-for="Message" class="text-danger" style="font-size:12px;"></span>
+        </div>
+
+        <button type="submit" class="contact-btn">Send Message</button>
+    </form>
+</section>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        var successMsg = '@TempData["SuccessMessage"]';
+
+        if (successMsg) {
+            Swal.fire({
+                title: 'Done!',
+                text: successMsg,
+                icon: 'success',       
+                confirmButtonColor: '#5D3CF2', // نفس لون الموقع بتاعك الموف
+                confirmButtonText: 'Ok, Thanks!'
+            });
+        }
+    </script>
+}

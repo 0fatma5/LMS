@@ -1,0 +1,462 @@
+﻿@model LMS.Models.Subject
+
+@{
+    ViewData["Title"] = "Content Manager";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary-color: #0f172a; /* Dark Slate for professionalism */
+        --accent-color: #4f46e5; /* Modern Indigo */
+        --bg-color: #f8fafc; /* Very light cool gray */
+        --card-bg: #ffffff;
+        --border-color: #e2e8f0;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-main);
+    }
+
+    .clean-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 60px 20px;
+    }
+
+    /* Header Section */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .page-title h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        color: var(--primary-color);
+        margin: 0;
+    }
+
+    .page-title span {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+
+    .btn-preview {
+        background-color: white;
+        color: var(--text-main);
+        border: 1px solid var(--border-color);
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+        .btn-preview:hover {
+            background-color: #f1f5f9;
+            border-color: #cbd5e1;
+            color: var(--primary-color);
+        }
+
+    /* Add Section Card (Floating Input) */
+    .add-section-wrapper {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        border: 1px solid var(--border-color);
+        margin-bottom: 40px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .clean-input {
+        border: none;
+        background: transparent;
+        padding: 15px;
+        font-size: 1rem;
+        flex-grow: 1;
+        outline: none;
+        color: var(--text-main);
+    }
+
+        .clean-input::placeholder {
+            color: #94a3b8;
+        }
+
+    .btn-add-circle {
+        background-color: var(--accent-color);
+        color: white;
+        width: 45px;
+        height: 45px;
+        border-radius: 10px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+        .btn-add-circle:hover {
+            transform: scale(1.05);
+            background-color: #4338ca;
+        }
+
+    /* Section Cards */
+    .section-block {
+        background: transparent;
+        margin-bottom: 30px;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 10px 15px 10px;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-badge {
+        background: #e0e7ff;
+        color: var(--accent-color);
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    /* Lesson List */
+    .lesson-container {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .lesson-row {
+        padding: 16px 24px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background 0.1s;
+    }
+
+        .lesson-row:last-child {
+            border-bottom: none;
+        }
+
+        .lesson-row:hover {
+            background-color: #f8fafc;
+        }
+
+    .lesson-meta {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .lesson-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+    }
+
+    .icon-video {
+        background: #eff6ff;
+        color: #3b82f6;
+    }
+    /* Soft Blue */
+    .icon-file {
+        background: #f0fdf4;
+        color: #16a34a;
+    }
+    /* Soft Green */
+
+    .lesson-name {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--text-main);
+    }
+
+    .lesson-type {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: block;
+    }
+
+    /* Actions */
+    .action-group {
+        display: flex;
+        gap: 8px;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+    }
+
+    .lesson-row:hover .action-group {
+        opacity: 1;
+    }
+
+    .btn-icon-soft {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        border: none;
+        background: transparent;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+        .btn-icon-soft:hover {
+            background: #f1f5f9;
+            color: var(--primary-color);
+        }
+
+        .btn-icon-soft.delete:hover {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+
+    /* Add Lesson Form (Integrated) */
+    .add-lesson-form {
+        background-color: #f8fafc;
+        padding: 15px 24px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .form-minimal-input {
+        background: white;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+        width: 100%;
+    }
+
+        .form-minimal-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+        }
+
+    .btn-add-small {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-muted);
+    }
+</style>
+
+<div class="clean-container">
+
+    <div class="page-header">
+        <div class="page-title">
+            <a asp-action="Index" class="text-decoration-none text-muted mb-2 d-inline-block small">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back to Courses
+            </a>
+            <h1>@Model.Name</h1>
+            <span>Curriculum Management</span>
+        </div>
+        <a href="@Url.Action("Watch", "Course", new { id = Model.Id })" target="_blank" class="btn-preview">
+            <i class="fa-regular fa-eye me-2"></i> Preview as Student
+        </a>
+    </div>
+
+    <form asp-action="AddModule" method="post">
+        <input type="hidden" name="subjectId" value="@Model.Id" />
+        <div class="add-section-wrapper">
+            <div style="padding-left: 15px; color: #94a3b8;">
+                <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <input type="text" name="title" class="clean-input" placeholder="Create a new section (e.g., 'Introduction to AI')..." required />
+            <button type="submit" class="btn-add-circle" title="Add Section">
+                <i class="fa-solid fa-plus"></i>
+            </button>
+        </div>
+    </form>
+
+    @if (Model.Modules != null && Model.Modules.Any())
+    {
+        @foreach (var module in Model.Modules)
+        {
+            <div class="section-block">
+                <div class="section-header">
+                    <div class="section-title">
+                        @module.Title
+                        <span class="section-badge">@module.Lessons.Count Lessons</span>
+                    </div>
+                    <form asp-action="DeleteModule" method="post" onsubmit="return confirm('Delete this entire section?');" style="margin:0;">
+                        <input type="hidden" name="moduleId" value="@module.Id" />
+                        <button type="submit" class="btn-icon-soft delete" title="Delete Section">
+                            <i class="fa-regular fa-trash-can"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="lesson-container">
+                    @if (module.Lessons.Any())
+                    {
+                        @foreach (var lesson in module.Lessons)
+                        {
+                            <div class="lesson-row">
+                                <div class="lesson-meta">
+                                    <div class="lesson-icon @(lesson.Type == LMS.Models.LessonType.Video ? "icon-video" : "icon-file")">
+                                        <i class="fa-solid @(lesson.Type == LMS.Models.LessonType.Video ? "fa-play" : "fa-file-lines")"></i>
+                                    </div>
+                                    <div>
+                                        <div class="lesson-name">@lesson.Title</div>
+                                        <span class="lesson-type">@(lesson.Type == LMS.Models.LessonType.Video ? "Video Lesson" : "Resource File")</span>
+                                    </div>
+                                </div>
+
+                                <div class="action-group">
+                                    <a asp-action="EditLesson" asp-route-id="@lesson.Id" class="btn-icon-soft">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+                                    <form asp-action="DeleteLesson" method="post" onsubmit="return confirm('Remove this lesson?');" style="margin:0;">
+                                        <input type="hidden" name="lessonId" value="@lesson.Id" />
+                                        <button type="submit" class="btn-icon-soft delete">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-4 text-muted small" style="background: #fff;">
+                            This section is empty. Add a lesson below.
+                        </div>
+                    }
+
+                    <div class="add-lesson-form">
+                        <form asp-action="AddLesson" method="post" enctype="multipart/form-data" class="row g-2 align-items-center">
+                            <input type="hidden" name="subjectId" value="@Model.Id" />
+                            <input type="hidden" name="moduleId" value="@module.Id" />
+
+                            <div class="col-md-4">
+                                <input type="text" name="title" class="form-minimal-input" placeholder="Lesson title..." required />
+                            </div>
+                            <div class="col-md-2">
+                                <select name="lessonType" class="form-minimal-input" style="background-color: #f1f5f9; cursor: pointer;" onchange="toggleInput(this)">
+                                    <option value="Video">Video</option>
+                                    <option value="File">File</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 input-area">
+                                <input type="url" name="url" class="form-minimal-input url-input" placeholder="https://youtube.com/..." />
+                                <input type="file" name="lessonFile" class="form-minimal-input file-input d-none" />
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <button type="submit" class="btn-add-small w-100">Add</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="empty-state">
+            <i class="fa-solid fa-layer-group fa-3x mb-3" style="color: #cbd5e1;"></i>
+            <h3>Start building your curriculum</h3>
+            <p>Use the input above to create your first section.</p>
+        </div>
+    }
+
+</div>
+
+<script>
+    function toggleInput(select) {
+        var row = select.closest('.row');
+        var urlInput = row.querySelector('.url-input');
+        var fileInput = row.querySelector('.file-input');
+
+        if (select.value === 'Video') {
+            urlInput.classList.remove('d-none');
+            fileInput.classList.add('d-none');
+            urlInput.setAttribute('required', 'required');
+            fileInput.removeAttribute('required');
+        } else {
+            urlInput.classList.add('d-none');
+            fileInput.classList.remove('d-none');
+            fileInput.setAttribute('required', 'required');
+            urlInput.removeAttribute('required');
+        }
+    }
+
+    @if (TempData["Success"] != null)
+    {
+            <text>
+            Swal.fire({
+                icon: 'success',
+                title: 'Done',
+                text: '@TempData["Success"]',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            });
+            </text>
+    }
+    @if (TempData["Error"] != null)
+    {
+            <text>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: '@TempData["Error"]'
+            });
+            </text>
+    }
+</script>

@@ -1,0 +1,119 @@
+﻿@model IEnumerable<LMS.Models.News>
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    ViewData["Title"] = "News & Blog";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    // بنجيب دور المستخدم عشان نظهرله أزرار التحكم لو كان أدمن أو مدرس
+    var userRole = HttpContextAccessor.HttpContext.Session.GetString("UserRole");
+}
+
+<section class="page-hero">
+    <i class="fas fa-book hero-decoration shape-1"></i>
+    <i class="far fa-lightbulb hero-decoration shape-2"></i>
+    <i class="fas fa-play hero-decoration shape-3"></i>
+    <div class="container">
+        <h1>News & Articles</h1>
+        <div class="breadcrumb">Home > Blog</div>
+    </div>
+</section>
+
+<main class="blog-section">
+    <div class="container">
+
+
+        <div class="blog-grid">
+
+            <div class="posts-column">
+
+                @if (!Model.Any())
+                {
+                    <div class="alert alert-info text-center p-5">
+                        <h3>No news available yet! 📭</h3>
+                        <p>Check back later for updates.</p>
+                    </div>
+                }
+                else
+                {
+                    @foreach (var item in Model)
+                    {
+                        <article class="blog-post" style="position: relative; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+
+                            <a asp-action="Details" asp-route-id="@item.Id" class="post-link">
+
+                                <div style="height: 250px; overflow: hidden;">
+                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                    {
+                                        <img src="~/images/news/@item.ImageUrl" alt="@item.Title" class="post-thumb" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s;">
+                                    }
+                                    else
+                                    {
+                                        <img src="https://via.placeholder.com/800x250?text=No+Image" alt="Default" class="post-thumb" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s;">
+                                    }
+                                </div>
+
+                                <div class="post-content" style="padding: 30px;">
+                                    <div class="post-meta">
+                                        <span><i class="far fa-user-circle"></i> By @item.Author</span>
+                                        <span><i class="far fa-clock"></i> @item.PublishedDate.ToString("MMM dd, yyyy")</span>
+                                        <span style="color: var(--primary-color); font-weight: 600;"><i class="fas fa-tag"></i> @item.Category</span>
+                                    </div>
+
+                                    <h2 class="post-title" style="font-size: 1.5rem; margin-bottom: 15px;">@item.Title</h2>
+
+                                    <p class="post-excerpt">
+                                        @(item.Description.Length > 120 ? item.Description.Substring(0, 120) + "..." : item.Description)
+                                    </p>
+
+                                    <span class="read-more" style="color: var(--primary-color); font-weight: 600;">Read More <i class="fas fa-arrow-right"></i></span>
+                                </div>
+                            </a>
+                        </article>
+                    }
+                }
+            </div>
+
+            <aside class="sidebar">
+                <div class="widget">
+                    <h4 class="widget-title">Search</h4>
+                    <div class="search-box">
+                        <input type="text" placeholder="Searching...">
+                        <button><i class="fas fa-search"></i></button>
+                    </div>
+                </div>
+
+                <div class="widget">
+                    <h4 class="widget-title">Categories</h4>
+                    <ul class="cat-list">
+                        <li><span>Technology</span></li>
+                        <li><span>Business</span></li>
+                        <li><span>Education</span></li>
+                        <li><span>Stories</span></li>
+                    </ul>
+                </div>
+            </aside>
+
+        </div>
+    </div>
+</main>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        var successMsg = '@TempData["SuccessMessage"]';
+        if (successMsg) {
+            Swal.fire({
+                title: 'Great Job!',
+                text: successMsg,
+                icon: 'success',
+                confirmButtonColor: '#5D3CF2',
+                confirmButtonText: 'Done'
+            });
+        }
+    </script>
+}
+<style>
+    .blog-post:hover .post-thumb {
+        transform: scale(1.05);
+    }
+</style>

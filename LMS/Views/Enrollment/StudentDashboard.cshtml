@@ -1,0 +1,100 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@model IEnumerable<LMS.Models.Enrollment>
+
+@{
+    ViewData["Title"] = "My Learning Dashboard";
+}
+
+<section class="page-hero">
+    <div class="container hero-inner">
+        <h1>My Learning Dashboard</h1>
+        <div class="breadcrumb">Home &gt; Dashboard</div>
+    </div>
+</section>
+
+<section class="events-section">
+    <div class="container">
+        <div class="events-list">
+
+            @if (!Model.Any())
+            {
+                <div class="text-center" style="padding: 50px;">
+                    <h3 style="color: #666;">You are not enrolled in any courses yet.</h3>
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-primary mt-3" style="background-color:var(--primary-color); border:none;">Browse Courses</a>
+                </div>
+            }
+            else
+            {
+                int i = 0;
+                foreach (var item in Model)
+                {
+                    // نفس اللوجيك عشان يبدل اتجاه الكارت (يمين/شمال)
+                    string cardClass = (i % 2 == 0) ? "event-card" : "event-card right";
+
+                    <article class="@cardClass">
+
+                        <div class="thumb">
+                            <img src="~/images/subjects/@item.Subject.ImageUrl"
+                                 alt="@item.Subject.Name"
+                                 onerror="this.onerror=null;this.src='https://via.placeholder.com/300x200?text=No+Image';">
+                        </div>
+
+                        <div class="content">
+                            <div class="meta">
+                                <span class="dot"></span>
+                                <span>Enrolled: @item.EnrollmentDate.ToString("dd MMM yyyy")</span>
+
+                                @if (item.Subject.Teacher != null)
+                                {
+                                    <span style="margin-left:8px; color:var(--primary-color); font-weight:600">
+                                        | @item.Subject.Teacher.FullName
+                                    </span>
+                                }
+                            </div>
+
+                            <div class="title">@item.Subject.Name</div>
+
+                            <div class="excerpt" style="margin: 15px 0;">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                    <small>Progress</small>
+                                    <small>@item.Progress%</small>
+                                </div>
+                                <div class="progress" style="height: 10px; background-color: #eee; border-radius: 5px; overflow: hidden;">
+                                    <div class="progress-bar" role="progressbar"
+                                         style="width: @item.Progress%; background-color: var(--primary-color);"
+                                         aria-valuenow="@item.Progress" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <a class="read-more" asp-controller="Course" asp-action="Watch" asp-route-id="@item.Subject.Id">
+                                Continue Learning <i class="fas fa-arrow-right" style="margin-left:8px;font-size:12px"></i>
+                            </a>
+
+                        </div>
+                    </article>
+
+                    i++;
+                }
+            }
+
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        var successMsg = '@TempData["SuccessMessage"]';
+        if (successMsg) {
+            Swal.fire({
+                title: 'Welcome!',
+                text: successMsg,
+                icon: 'success',
+                confirmButtonColor: '#5D3CF2',
+                confirmButtonText: 'Start Learning'
+            });
+        }
+    </script>
+}
