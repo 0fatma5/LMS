@@ -23,3 +23,5 @@ jobs:
         run: dotnet restore LMS.sln
       - name: Build in Release mode
         run: dotnet build LMS.sln --configuration Release --no-restore
+      - name: Run authentication model tests
+        run: dotnet test LMS.Tests/LMS.Tests.csproj --configuration Release --verbosity normal
