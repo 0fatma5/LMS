@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters; 
-using Microsoft.AspNetCore.Http; // تأكد من وجود هذه
+using LMS.Data;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace LMS.Filters
 {
@@ -8,14 +11,21 @@ namespace LMS.Filters
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            // 1. قراءة الرتبة من الذاكرة
-            var userRole = context.HttpContext.Session.GetString("UserRole");
-
-            // 2. إذا لم يكن المستخدم "Admin"
-            if (userRole != "Admin")
+            var userId = context.HttpContext.Session.GetInt32("UserId");
+            if (!userId.HasValue)
             {
-                // 3. اطرده فوراً لصفحة الدخول
                 context.Result = new RedirectToActionResult("Login", "Account", null);
+                return;
+            }
+
+            // Checking the DB on each admin request prevents stale session roles from
+            // retaining admin access after a role change or account deletion.
+            var db = context.HttpContext.RequestServices.GetRequiredService<AppDbContext>();
+            var isAdmin = db.Users.AsNoTracking().Any(u => u.Id == userId.Value && u.Role == "Admin");
+            if (!isAdmin)
+            {
+                context.Result = new StatusCodeResult(StatusCodes.Status403Forbidden);
+                return;
             }
 
             base.OnActionExecuting(context);

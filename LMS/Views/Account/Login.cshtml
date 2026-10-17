@@ -16,16 +16,16 @@
                 </div>
             }
 
-            <form asp-action="Login" method="POST">
+            <form asp-action="Login" method="post" asp-antiforgery="true">
 
                 <div class="form-group">
                     <label for="email" style="display:none;">Email</label>
-                    <input type="email" id="email" name="email" placeholder="Enter your email..." required>
+                    <input type="email" id="email" name="email" autocomplete="username" placeholder="Enter your email..." required>
                 </div>
 
                 <div class="form-group">
                     <label for="password" style="display:none;">Password</label>
-                    <input type="password" id="password" name="password" placeholder="Enter your password..." required>
+                    <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Enter your password..." required>
                 </div>
 
                 <button type="submit" class="btn btn-primary login-button">Log in</button>
