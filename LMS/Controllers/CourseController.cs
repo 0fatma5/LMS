@@ -33,7 +33,7 @@ namespace LMS.Controllers
 
             bool enrolled = _context.Enrollments
                 .Any(e => e.StudentId == userId.Value && e.SubjectId == courseId);
-            if (!enrolled) return Forbid();
+            if (!enrolled) return StatusCode(StatusCodes.Status403Forbidden);
 
             var existing = _context.UserProgresses
                 .FirstOrDefault(p => p.UserId == userId.Value && p.LessonId == lessonId);
@@ -86,6 +86,7 @@ namespace LMS.Controllers
             int? userId = HttpContext.Session.GetInt32("UserId");
             bool hasAccess = userId.HasValue && (
                 subject.TeacherId == userId.Value
+                || _context.Users.Any(u => u.Id == userId.Value && u.Role == "Admin")
                 || _context.Enrollments.Any(e => e.StudentId == userId.Value && e.SubjectId == id));
             // Only explicitly marked preview lessons are public.
             if (!currentLesson.IsPreview && !hasAccess)
