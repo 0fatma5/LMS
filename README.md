@@ -75,9 +75,16 @@ For a **brief, private local migration window only**, an administrator may opt i
 
 **Do not treat the presence of this README as a completed security audit.**
 
-## Validation
+## Validation and tests
 
-The source was reviewed and changes were prepared in a separate branch. A .NET build and integration tests are still required before merging. This repository does not currently include a complete automated test suite.
+A .NET 8 build runs in GitHub Actions for pull requests, followed by a small automated authentication-safety test project. Run them locally with:
+
+```bash
+dotnet build LMS.sln --configuration Release
+dotnet test LMS.Tests/LMS.Tests.csproj --configuration Release
+```
+
+The tests cover public signup role validation, password-strength input validation, and password hashing. **These are unit tests, not end-to-end security tests.** Full SQL Server/database-backed integration tests and manual browser testing are still required before merging or deploying.
 
 Suggested manual checks:
 
