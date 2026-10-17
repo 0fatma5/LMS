@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using LMS.Data;
 using LMS.Models;
 using LMS.ViewModels;
-using System.Linq;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LMS.Controllers
 {
@@ -17,99 +16,96 @@ namespace LMS.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult CompleteLesson(int lessonId, int courseId)
         {
-            int userId = 1; // User ID ثابت للتجربة
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (!userId.HasValue) return RedirectToAction("Login", "Account");
 
-            // 1. تسجيل إن الدرس خلص
-            var existingProgress = _context.UserProgresses
-                .FirstOrDefault(p => p.UserId == userId && p.LessonId == lessonId);
-
-            if (existingProgress == null)
-            {
-                _context.UserProgresses.Add(new UserLessonProgress
-                {
-                    UserId = userId,
-                    LessonId = lessonId,
-                    IsCompleted = true
-                });
-                _context.SaveChanges();
-            }
-
-            // ==========================================
-            // 2. التعديل هنا: استخدمنا Subjects بدل Courses
-            // ==========================================
             var subject = _context.Subjects
                 .Include(s => s.Modules).ThenInclude(m => m.Lessons)
                 .FirstOrDefault(s => s.Id == courseId);
-
-            var totalLessons = subject.Modules.SelectMany(m => m.Lessons).Count();
-
-            var completedLessons = _context.UserProgresses
-                .Where(p => p.UserId == userId && p.IsCompleted && p.Lesson.Module.SubjectId == courseId)
-                .Count();
-
-            int percentage = totalLessons == 0 ? 0 : (int)((double)completedLessons / totalLessons * 100);
-
-            // 3. تحديث الـ Enrollment
-            var enrollment = _context.Enrollments
-                .FirstOrDefault(e => e.StudentId == userId && e.SubjectId == courseId);
-
-            if (enrollment != null)
-            {
-                enrollment.Progress = percentage;
-                _context.SaveChanges();
-            }
-
-            return RedirectToAction("Watch", new { id = courseId, lessonId = lessonId });
-        }
-
-        public IActionResult Watch(int id, int? lessonId)
-        {
-            // ==========================================
-            // التعديل الأول: Subjects بدل Courses
-            // ==========================================
-            var subject = _context.Subjects
-                .Include(s => s.Modules)
-                .ThenInclude(m => m.Lessons)
-                .FirstOrDefault(s => s.Id == id); // استخدمنا المتغير id
-
             if (subject == null) return NotFound();
 
-            Lesson currentLesson = null;
-            if (lessonId.HasValue)
+            var lessonExists = subject.Modules.SelectMany(m => m.Lessons)
+                .Any(l => l.Id == lessonId);
+            if (!lessonExists) return NotFound();
+
+            bool enrolled = _context.Enrollments
+                .Any(e => e.StudentId == userId.Value && e.SubjectId == courseId);
+            if (!enrolled) return Forbid();
+
+            var existing = _context.UserProgresses
+                .FirstOrDefault(p => p.UserId == userId.Value && p.LessonId == lessonId);
+            if (existing == null)
             {
-                currentLesson = subject.Modules.SelectMany(m => m.Lessons).FirstOrDefault(l => l.Id == lessonId.Value);
+                _context.UserProgresses.Add(new UserLessonProgress
+                {
+                    UserId = userId.Value,
+                    LessonId = lessonId,
+                    IsCompleted = true
+                });
             }
             else
             {
-                currentLesson = subject.Modules.FirstOrDefault()?.Lessons.FirstOrDefault();
+                existing.IsCompleted = true;
+            }
+            _context.SaveChanges();
+
+            int total = subject.Modules.SelectMany(m => m.Lessons).Count();
+            int completed = _context.UserProgresses
+                .Count(p => p.UserId == userId.Value && p.IsCompleted
+                    && p.Lesson.Module.SubjectId == courseId);
+            int percent = total == 0 ? 0 : (int)((double)completed / total * 100);
+
+            var enrollment = _context.Enrollments.FirstOrDefault(e =>
+                e.StudentId == userId.Value && e.SubjectId == courseId);
+            if (enrollment != null)
+            {
+                enrollment.Progress = percent;
+                _context.SaveChanges();
             }
 
-            if (currentLesson == null) return Content("No content available.");
+            return RedirectToAction(nameof(Watch), new { id = courseId, lessonId });
+        }
 
-            int userId = 1;
+        [HttpGet]
+        public IActionResult Watch(int id, int? lessonId)
+        {
+            var subject = _context.Subjects
+                .Include(s => s.Modules).ThenInclude(m => m.Lessons)
+                .FirstOrDefault(s => s.Id == id);
+            if (subject == null) return NotFound();
 
-            var totalLessons = subject.Modules.SelectMany(m => m.Lessons).Count();
+            var lessons = subject.Modules.SelectMany(m => m.Lessons).ToList();
+            var currentLesson = lessonId.HasValue
+                ? lessons.FirstOrDefault(l => l.Id == lessonId.Value)
+                : lessons.FirstOrDefault();
+            if (currentLesson == null) return NotFound();
 
-            // ==========================================
-            // التعديل الثاني (تصحيح الخطأ):
-            // غيرنا courseId لـ id (لأن الباراميتر اسمه id)
-            // ==========================================
-            var completedLessons = _context.UserProgresses
-                .Where(p => p.UserId == userId && p.IsCompleted && p.Lesson.Module.SubjectId == id)
-                .Count();
-
-            int percentage = totalLessons == 0 ? 0 : (int)((double)completedLessons / totalLessons * 100);
-
-            var viewModel = new CoursePlayerViewModel
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            bool hasAccess = userId.HasValue && (
+                subject.TeacherId == userId.Value
+                || _context.Enrollments.Any(e => e.StudentId == userId.Value && e.SubjectId == id));
+            // Only explicitly marked preview lessons are public.
+            if (!currentLesson.IsPreview && !hasAccess)
             {
-                Course = subject, // ده هيشتغل دلوقتي عشان عدلنا الـ ViewModel
-                CurrentLesson = currentLesson,
-                ProgressPercentage = percentage
-            };
+                if (!userId.HasValue) return RedirectToAction("Login", "Account");
+                return RedirectToAction("Checkout", "Enrollment", new { courseId = id });
+            }
 
-            return View(viewModel);
+            int completed = userId.HasValue
+                ? _context.UserProgresses.Count(p =>
+                    p.UserId == userId.Value && p.IsCompleted && p.Lesson.Module.SubjectId == id)
+                : 0;
+            int percent = lessons.Count == 0 ? 0 : (int)((double)completed / lessons.Count * 100);
+
+            return View(new CoursePlayerViewModel
+            {
+                Course = subject,
+                CurrentLesson = currentLesson,
+                ProgressPercentage = percent
+            });
         }
     }
 }
