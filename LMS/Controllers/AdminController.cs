@@ -25,7 +25,7 @@ namespace LMS.Controllers
         }
 
         // 2. أمر ترقية المستخدم لمدير
-        public IActionResult MakeAdmin(int id)
+        [HttpPost]\n        [ValidateAntiForgeryToken]\n        public IActionResult MakeAdmin(int id)
         {
             var user = _context.Users.Find(id);
 
