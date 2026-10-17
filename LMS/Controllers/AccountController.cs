@@ -34,7 +34,7 @@ namespace LMS.Controllers
             if (!ModelState.IsValid) return View(form);
 
             string email = form.Email.Trim().ToLowerInvariant();
-            if (_context.Users.Any(user => user.Email == email))
+            if (_context.Users.Any(user => user.Email.ToLower() == email))
             {
                 ModelState.AddModelError(nameof(form.Email), "This email is already registered.");
                 return View(form);
@@ -75,7 +75,7 @@ namespace LMS.Controllers
             }
 
             string normalizedEmail = email.Trim().ToLowerInvariant();
-            var user = _context.Users.FirstOrDefault(u => u.Email == normalizedEmail);
+            var user = _context.Users.FirstOrDefault(u => u.Email.ToLower() == normalizedEmail);
             if (user == null)
             {
                 ViewBag.Error = "Invalid email or password.";
