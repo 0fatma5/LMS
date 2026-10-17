@@ -24,7 +24,7 @@ namespace LMS.Filters
             var isAdmin = db.Users.AsNoTracking().Any(u => u.Id == userId.Value && u.Role == "Admin");
             if (!isAdmin)
             {
-                context.Result = new ForbidResult();
+                context.Result = new StatusCodeResult(StatusCodes.Status403Forbidden);
                 return;
             }
 
