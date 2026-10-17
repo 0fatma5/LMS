@@ -189,7 +189,7 @@
                         </div>
                     </div>
 
-                    <form asp-action="CompleteLesson" method="post">
+                    <form asp-action="CompleteLesson" method="post" asp-antiforgery="true">
                         <input type="hidden" name="lessonId" value="@Model.CurrentLesson.Id" />
                         <input type="hidden" name="courseId" value="@Model.Course.Id" />
 
