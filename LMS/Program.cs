@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using LMS.Data;\nusing LMS.Models;\nusing Microsoft.AspNetCore.Identity;
+using LMS.Data;
+using LMS.Models;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,11 +9,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Password hashing (ASP.NET Core Identity hashing without changing the existing Users table)\nbuilder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();\n\n// Session requires an IDistributedCache implementation.\nbuilder.Services.AddDistributedMemoryCache();\n\n// 2. إعداد الـ Session
+// Password hashing (ASP.NET Core Identity hashing without changing the existing Users table)
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
+// Session requires an IDistributedCache implementation.
+builder.Services.AddDistributedMemoryCache();
+
+// 2. إعداد الـ Session
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;\n    options.Cookie.SameSite = SameSiteMode.Lax;\n    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
     options.Cookie.IsEssential = true;
 });
 
