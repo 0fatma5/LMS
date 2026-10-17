@@ -108,7 +108,7 @@
                         </a>
                     }
 
-                    <a href="/Account/Logout" class="btn btn-white" style="font-size:14px; padding: 8px 15px;">Logout</a>
+                    <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">\n                        @Html.AntiForgeryToken()\n                        <button type="submit" class="btn btn-white" style="font-size:14px; padding:8px 15px;">Logout</button>\n                    </form>
                 }
                 else
                 {
