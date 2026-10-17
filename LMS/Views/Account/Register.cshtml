@@ -12,7 +12,7 @@
         <div class="login-form-area">
             <h2>Create Account</h2>
 
-            <form asp-action="Register" method="post">\n                @Html.AntiForgeryToken()
+            <form asp-action="Register" method="post" asp-antiforgery="true">
 
                 <div class="form-group">
                     <input asp-for="FullName" placeholder="Full Name" required autocomplete="off">
