@@ -56,8 +56,7 @@
                             <td style="text-align:center;">
                                 @if (user.Role != "Admin")
                                 {
-                                    <form asp-controller="Admin" asp-action="MakeAdmin" asp-route-id="@user.Id" method="post" style="display:inline;">
-                                        @Html.AntiForgeryToken()
+                                    <form asp-controller="Admin" asp-action="MakeAdmin" asp-route-id="@user.Id" method="post" asp-antiforgery="true" style="display:inline;">
                                         <button type="submit" class="btn-action btn-promote" onclick="return confirm('Promote to Admin?')">
                                             Make Admin <i class="fas fa-arrow-up"></i>
                                         </button>
